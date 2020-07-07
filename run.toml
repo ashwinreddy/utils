@@ -1,4 +1,4 @@
-# This is an example TOML script to tell offizier how to run your code with doodad
+# This is an example TOML script to tell utils how to run your code with doodad
 
 
 # every reference to this codebase needs to be prepended with the `local_directory_mount`, so pick something short
