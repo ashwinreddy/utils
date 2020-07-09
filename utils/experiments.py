@@ -1,3 +1,6 @@
+from pathlib import Path
+import json
+import utils
 
 def exp_results(directory, priority=0):
     """
@@ -22,11 +25,11 @@ def exp_results(directory, priority=0):
                 pass
                 #print("Could not parse", path)
         elif path.suffix == ".csv":
-            obj = bb.Table.from_csv(str(path.absolute()))
+            obj = utils.Table.from_csv(str(path.absolute()))
         
         if obj is not None:
             experiment_results[path.name] = obj
 
-    return bb.Experiment(experiment_results, rescales=bb.Experiment.default_rescales)
+    return utils.Experiment(experiment_results, rescales=utils.Experiment.default_rescales)
     
 

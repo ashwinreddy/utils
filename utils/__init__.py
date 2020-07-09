@@ -3,6 +3,13 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
+def compare_exps_on_metric(pair, title, label_fn):
+    for exp in pair:
+        plt.plot(exp.table['Timesteps'], exp.table['Reward'], label = label_fn(exp))
+
+    plt.title(title)
+    plt.legend()
+
 class Table(pd.DataFrame):
     """
     An extension to the pandas DataFrame with some handy utilities
@@ -61,6 +68,14 @@ class Experiment(object):
     @property
     def env(self):
         return self['params.json']['environment_params']['training']['domain']
+
+    @property
+    def task(self):
+        return self['params.json']['environment_params']['training']['task']
+
+    @property
+    def algo(self):
+        return self['params.json']['algorithm_params']['type']
 
     @property
     def reward_keys(self):
