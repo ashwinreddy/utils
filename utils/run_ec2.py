@@ -32,6 +32,7 @@ def parse_config(config: dict, debug: bool):
                     's3_path': config['s3']['path'],
                     's3_bucket': config['s3']['bucket'],
                     'mount_point': mount_params['mount_point'],
+                    'output': True
             }
         else:
             mount_type = dd.mount.MountLocal

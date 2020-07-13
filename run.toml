@@ -8,14 +8,31 @@ docker_image = "abhiguptaberk/softlearningashwin:latest"
 command = "source /code/setup.sh"
 verbose = true
 
+[hyperparams]
+temparg = ["yo", "bo", "ho"]
+domain = ["SawyerDhandFlip"]
+task = ["v0"]
+algorithm = ["SAC"]
+
+
 [mounts]
+
+[mounts.r3l]
+
+local_dir = "/home/abhigupta/abhishek_sandbox/r3l/r3l"
+mount_point = "/code/r3l"
+
+[mounts.mjrl]
+
+local_dir = "/home/abhigupta/abhishek_sandbox/mjrl/mjrl"
+mount_point = "/code/mjrl"
 
 # Output Mount - where you can retrieve the results from the docker run
 # local_dir is where it will be transferred during a debug run
 # scroll down to [s3] for more info about buckets
 [mounts.output]
 
-local_dir = "/home/ashwin/Research/output"
+local_dir = "/home/abhigupta/s3_output"
 mount_point = "/root/ray_results"
 
 
@@ -26,5 +43,5 @@ region = "us-west-1"
 
 # This is where you specify where the outputs will go in s3.
 [s3]
-bucket = "doodad-ashwin-redone2"
+bucket = "goalsrl"
 path = "outputs"
