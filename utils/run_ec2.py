@@ -26,9 +26,6 @@ def parse_config(config: dict, debug: bool):
     ]
 
     for key, mount_params in config['mounts'].items():
-        if key == "output":
-            mount_params['output'] = True
-
         if key == "output" and not debug:
             mount_type = dd.mount.MountS3
             mount_params = {
@@ -38,7 +35,10 @@ def parse_config(config: dict, debug: bool):
             }
         else:
             mount_type = dd.mount.MountLocal
-            
+        
+        if key == "output":
+            mount_params['output'] = True
+   
         mounts.append( mount_type(**mount_params) ) 
 
     hold = False
@@ -57,7 +57,6 @@ def parse_config(config: dict, debug: bool):
         'command': config['command'],
         'mode': mode,
         'mount_points': mounts,
-        'verbose': True
     }
     print(kwargs)
     return kwargs, hold
