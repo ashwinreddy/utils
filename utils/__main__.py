@@ -1,4 +1,4 @@
-import batbelt as bb
+import utils
 import matplotlib.pyplot as plt
 import argparse
 from pathlib import Path
@@ -6,7 +6,7 @@ from rich import print
 import json
 import pandas as pd
 from IPython import embed
-import tempfile
+
 
 
 
@@ -30,16 +30,13 @@ def exp_results(directory, priority=0):
                 pass
                 #print("Could not parse", path)
         elif path.suffix == ".csv":
-            obj = bb.Table.from_csv(str(path.absolute()))
+            obj = utils.Table.from_csv(str(path.absolute()))
         
         if obj is not None:
             experiment_results[path.name] = obj
 
-    return bb.Experiment(experiment_results, rescales=bb.Experiment.default_rescales)
+    return utils.Experiment(experiment_results, rescales=utils.Experiment.default_rescales)
     
-
-def quicksave():
-    plt.savefig(tempfile.NamedTemporaryFile(dir='/home/ashwin/Plots', suffix='.png').name)
 
 def main(args):
     experiments = []

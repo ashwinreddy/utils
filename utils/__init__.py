@@ -2,11 +2,25 @@ import seaborn as sns
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+# from colorhash import ColorHash
+# ColorHash(exp.algo).hex
 
-def compare_exps_on_metric(pair, title, label_fn):
+def algo_to_color(alg):
+    return {
+        "SAC" : "C0",
+        "DistAwareSAC": "C1"
+    }[alg]
+    
+
+def compare_exps_on_metric(pair, title = None, label_fn = lambda x: f"{x.algo}" ):
+    if title is None:
+        title = pair[0].env + '-' + pair[0].task
+
     for exp in pair:
-        plt.plot(exp.table['Timesteps'], exp.table['Reward'], label = label_fn(exp))
+        plt.plot(exp.table['Timesteps'], exp.table['Reward'], label = label_fn(exp), c =  algo_to_color(exp.algo))
 
+    plt.xlabel('Timesteps (M)')
+    plt.ylabel('Reward (K)')
     plt.title(title)
     plt.legend()
 
