@@ -18,7 +18,7 @@ def compare_exps_on_metric(pair, metrics, ylabel = None, title = None, label_fn 
         label_fn = lambda x : str(x.algo)
     
     if title is None:
-        title = pair[0].env + '-' + pair[0].task
+        title = pair[0].task
 
     if color_fn is None:
         color_fn = lambda exp: algo_to_color(exp.algo)
@@ -108,7 +108,7 @@ class Experiment(object):
 
     @property
     def task(self):
-        return self['params.json']['environment_params']['training']['task']
+        return f"{self.env}-{self['params.json']['environment_params']['training']['task']}"
 
     @property
     def algo(self):

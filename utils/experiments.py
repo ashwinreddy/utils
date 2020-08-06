@@ -30,6 +30,6 @@ def exp_results(directory, priority=0):
         if obj is not None:
             experiment_results[path.name] = obj
 
-    return utils.Experiment(experiment_results, rescales=utils.Experiment.default_rescales)
+    return utils.Experiment(experiment_results)
     
 
