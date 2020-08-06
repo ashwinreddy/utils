@@ -35,7 +35,9 @@ def exp_results(directory, priority=0):
         if obj is not None:
             experiment_results[path.name] = obj
 
-    return utils.Experiment(experiment_results, rescales=utils.Experiment.default_rescales)
+    exp = utils.Experiment(experiment_results)
+    # exp.table.process(utils.Experiment.default_rescales)
+    return exp
     
 
 def main(args):
@@ -50,8 +52,9 @@ def main(args):
             exp = experiments[0]
         embed()
     else:
+        metric = 'training/env_infos/distance_to_target-last-mean'
         for exp in experiments:
-            plt.plot(exp.table['Timesteps'], exp.table['Reward'], label = input(f"Label for {exp.name}? ") or exp.name.split("-")[-1])
+            plt.plot(exp.table[exp.x_axis], exp.table[metric], label = input(f"Label for {exp.name}? ") or exp.name.split("-")[-1])
 
 
     #ax = experiments[0].plot()
@@ -62,12 +65,13 @@ def main(args):
         title = f"{domain}-{task}" 
 
         plt.title(title)
-        plt.ylabel("Return")
+        plt.ylabel(metric)
 
         plt.legend()
 
         if args.save:
-            quicksave()
+            import utils.plotting
+            utils.plotting.quicksave()
         else:
             plt.show()
 

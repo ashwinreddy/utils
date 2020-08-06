@@ -1,9 +1,10 @@
-import seaborn as sns
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
 # from colorhash import ColorHash
 # ColorHash(exp.algo).hex
+
+from utils.plotting import quicksave
 
 def algo_to_color(alg):
     return {
@@ -12,15 +13,31 @@ def algo_to_color(alg):
     }[alg]
     
 
-def compare_exps_on_metric(pair, title = None, label_fn = lambda x: f"{x.algo}" ):
+def compare_exps_on_metric(pair, metrics, ylabel = None, title = None, label_fn = False , color_fn = None):
+    if not label_fn:
+        label_fn = lambda x : str(x.algo)
+    
     if title is None:
         title = pair[0].env + '-' + pair[0].task
 
-    for exp in pair:
-        plt.plot(exp.table['Timesteps'], exp.table['Reward'], label = label_fn(exp), c =  algo_to_color(exp.algo))
+    if color_fn is None:
+        color_fn = lambda exp: algo_to_color(exp.algo)
 
-    plt.xlabel('Timesteps (M)')
-    plt.ylabel('Reward (K)')
+    if type(metrics) is str:
+        metrics = [metrics] * len(pair)
+
+    for i, exp in enumerate(pair):
+        if callable(label_fn):
+            label = label_fn(exp)
+        else:
+            label = label_fn[i]
+
+        plt.plot(exp.table[exp.x_axis], exp.table[metrics[i]], label = label, ) #c =  color_fn(exp))
+
+    plt.xlabel(exp.x_axis)
+    if ylabel:
+        plt.ylabel(ylabel)
+    # plt.ylabel(metric)
     plt.title(title)
     plt.legend()
 
@@ -35,7 +52,8 @@ class Table(pd.DataFrame):
             df = pd.read_csv(csv)
         except:
             print("Couldn't read {}".format(csv))
-
+            return
+ 
         df.__class__ = Table
         return df
 
@@ -59,16 +77,18 @@ class Table(pd.DataFrame):
             self.scale(new_key, key, factor)
 
 class Experiment(object):
-    x_axis = "Timesteps"
+    x_axis = "epoch"
+    time_key = "timesteps_total"
 
     common_reward_keys = ['evaluation/return-average', 'ext_reward-mean']
 
 
-    default_rescales = [["Timesteps", "timesteps_total", "M"], ["Reward", common_reward_keys, "K"]]
+    default_rescales = [["Timesteps", time_key, "M"], ["Reward", common_reward_keys, "K"]]
 
-    def __init__(self, contents, rescales):
-        self.contents = contents
-        self.table.process(rescales)
+    table_file = 'progress.csv'
+
+    def __init__(self, contents):
+        self.contents = contents        
 
     def __getitem__(self, key):
         return self.contents[key]
@@ -81,7 +101,10 @@ class Experiment(object):
 
     @property
     def env(self):
-        return self['params.json']['environment_params']['training']['domain']
+        if 'variant.json' in self.contents:
+            return self['variant.json']['env_class']['$class'].split('.')[-1]
+        else:
+            return self['params.json']['environment_params']['training']['domain']
 
     @property
     def task(self):
@@ -89,18 +112,27 @@ class Experiment(object):
 
     @property
     def algo(self):
-        return self['params.json']['algorithm_params']['type']
+        if 'variant.json' in self.contents:
+            return self['variant.json']['algorithm']
+        else:
+            return self['params.json']['algorithm_params']['type']
 
     @property
     def reward_keys(self):
-        return [key for key in self.table.keys() if "ret" in key or "rew" in key]
+        return [key for key in self.table.keys() if "ret" in key.lower() or "rew" in key.lower()]
+    
+    @property
+    def metrics(self):
+        return list(self.table.keys())
 
     @property
     def table(self):
-        return self['progress.csv']
+        return self[self.table_file]
 
-    def plot(self, y, ax=None):
-        self.ax = self.table.plot(x= self.x_axis, y= y, title = self.env, ax = ax, legend=True)
+    def plot(self, y, ax=None, title = None):
+        if title is None:
+            title = "{} on {}".format(self.algo, self.env) 
+        self.ax = self.table.plot(x= self.x_axis, y= y, title = title, ax = ax, legend=True)
         return self.ax
     
     def plot_together(self, ys):

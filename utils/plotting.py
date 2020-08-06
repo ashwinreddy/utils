@@ -8,25 +8,29 @@ import tempfile
 def quicksave(dir = '/home/ashwin/Plots'):
     plt.savefig(tempfile.NamedTemporaryFile(dir=dir, suffix='.png').name)
 
-p = Path('./')
+def main():
+    p = Path('./')
 
-exps = []
-tasks = set()
+    exps = []
+    tasks = set()
 
-for f in filter(Path.is_dir, p.iterdir()):
-    exp = utils.experiments.exp_results(f, 1)
-    exps.append(exp)
-    print(exp.task)
-    tasks.add(exp.task)
+    for f in filter(Path.is_dir, p.iterdir()):
+        exp = utils.experiments.exp_results(f, 1)
+        exps.append(exp)
+        print(exp.task)
+        tasks.add(exp.task)
 
 
-for task in tasks:
-    print(task)
-    pair = list( filter( lambda x: x.task == task, exps ) )
-    # from IPython import embed; embed()
-    utils.compare_exps_on_metric(pair)
-    quicksave()
-    # plt.show()
+    for task in tasks:
+        print(task)
+        pair = list( filter( lambda x: x.task == task, exps ) )
+        # from IPython import embed; embed()
+        utils.compare_exps_on_metric(pair)
+        quicksave()
+        # plt.show()
 
 
 # from IPython import embed; embed()
+
+if __name__ == "__main__":
+    main()
