@@ -61,17 +61,18 @@ def parse_config(config: dict, debug: bool):
         'command': config['command'],
         'mode': mode,
         'mount_points': mounts,
+        'runner': config['runner']
         # 'verbose': True
     }
     print(kwargs)
     return kwargs, hold
 
-def run_sweep_doodad_command(run_command, params, run_mode, mounts, repeat=1, test_one=False):
+def run_sweep_doodad_command(run_command, runner, params, run_mode, mounts, repeat=1, test_one=False):
     sweeper = Sweeper(params, repeat)
     for config in sweeper:
-        run_command_curr = "softlearning run_example_local examples.development"
+        run_command_curr = runner #"softlearning run_example_local examples.classifier_rl"
         for k, v in config.items():
-            run_command_curr += " --" + str(k) + " " + str(v)
+            run_command_curr += " --" + str(k) + "=" + str(v)
         run_command_curr = " \"" + run_command_curr + "\""
         run_command_full = run_command + run_command_curr
         dd.launch_shell(
@@ -93,6 +94,7 @@ def main(args):
     sweep_params = config['hyperparams']
     if should_launch.lower().startswith("y"):
         run_sweep_doodad_command(run_command=kwargs['command'],
+                                    runner = kwargs['runner'],
                                     params=sweep_params,
                                     run_mode=kwargs['mode'],
                                     mounts=kwargs['mount_points'])
